@@ -9,17 +9,27 @@ using ConsoleApplication2.Extensions;
 using System.IO;
 using Microsoft.CodeAnalysis.Emit;
 using Newtonsoft.Json;
+using System.Reflection;
 
 namespace ConsoleApplication2
 {
+    public class Person
+    {
+        public string firstName { get; set; }
+        public string lastName { get; set; }
+    }
+
     class Program
     {
         public string MyName { get; set; }
 
         static void Main(string[] args)
-        {               
+        {
+            var res = JsonConvert.DeserializeObject<Person>("{'firstName':'Jeppe', 'lastName' : 'Kristensen'}");
+
             var converter = new JsonConverter();
-            var parsedObject = converter.ParseJson("{'persons':[{ 'age' : 5 },{ 'age' : 10, nameDetails:{'firstName':'Jeppe', 'lastName':'Kristensen', 'yearsActive':[3,5,7]}}]}");
+            var parsedObject = converter.ParseJson("{ contents : [{'firstName':'Jeppe', 'lastName' : 'Kristensen'}, {'firstName':'Lene', 'lastName' : 'Vestergaard'}] }");
+            
             var parser = new CsharpRoslynParser();
             parser.Parse(parsedObject);
                 //System.Console.WriteLine(Converter.ConvertJson("test"));
@@ -27,16 +37,18 @@ namespace ConsoleApplication2
     }
 
     public class CsharpRoslynParser
-    {       
+    {
         public void Parse(ParsedCommonInformation commonInformation)
         {
             var compilationRoot = CompilationUnit()
                 .WithUsings(GenerateUsings(commonInformation))
-                .WithMembers(VisitNamespace(commonInformation));
+                .WithMembers(VisitNamespace(commonInformation)).NormalizeWhitespace();
 
             var compilation = CSharpCompilation.Create("HelloTest")
 
-                    .AddReferences(new MetadataFileReference(typeof(object).Assembly.Location), new MetadataFileReference(typeof(JsonReader).Assembly.Location))
+                    .AddReferences(new MetadataFileReference(
+                        typeof(object).Assembly.Location), 
+                        new MetadataFileReference(typeof(JsonReader).Assembly.Location), new MetadataFileReference(typeof(Enumerable).Assembly.Location))
                     .AddSyntaxTrees(new SyntaxTree[] { compilationRoot.SyntaxTree });
 
             using (var memoryStream = new MemoryStream())
@@ -57,15 +69,72 @@ namespace ConsoleApplication2
             Console.ForegroundColor = ConsoleColor.White;
 
             int i = 0;
-             
+            var main = compilationRoot.DescendantNodesAndSelf().OfType<MethodDeclarationSyntax>().Where(x => x.Identifier.ToString() == "Run").SelectMany(x => x.DescendantNodes().OfType<BlockSyntax>()).First();
+            CompilationUnitSyntax modified;            
+
+            while (true)
+            {
+                Console.WriteLine("Enter code");
+                var codeString = Console.ReadLine();
+
+                modified = compilationRoot
+                .ReplaceNode(main, main.AddStatements(ParseStatement(codeString)))
+                .NormalizeWhitespace();
+
+
+                compilation = CSharpCompilation.Create("HelloTest")
+                   .AddReferences(new MetadataFileReference(
+                        typeof(object).Assembly.Location),new MetadataFileReference(typeof(JsonReader).Assembly.Location), new MetadataFileReference(typeof(Enumerable).Assembly.Location))
+                   .AddSyntaxTrees(new SyntaxTree[] { modified.SyntaxTree })
+                   .WithOptions(new CSharpCompilationOptions(outputKind: OutputKind.DynamicallyLinkedLibrary));
+
+                
+
+                using (var stream = new MemoryStream())
+                {
+                    EmitResult result = compilation.Emit(stream);
+
+                    if (result.Success)
+                    {
+                        var assembly = Assembly.Load(stream.GetBuffer());
+                        var type = assembly.GetType("Custom.ShowRunner");
+                        var method = type.GetMethod("Run");
+
+                        var rootType = assembly.GetType("Custom.Root");
+
+
+                        method.Invoke(null, new object[] { JsonConvert.DeserializeObject( commonInformation.OriginalSource, rootType )  });
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+
+                        Console.WriteLine(modified.ToString());
+
+                        foreach (var res in result.Diagnostics)
+                        {
+                            Console.ForegroundColor = ConsoleColor.Red;
+                            Console.WriteLine(res);
+                        };
+
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+
+
+
+                }
+
+            }
         }
 
         private SyntaxList<UsingDirectiveSyntax> GenerateUsings(ParsedCommonInformation commonInformation)
         {
             return List<UsingDirectiveSyntax>(
                 new[] {
+                    UsingDirective(IdentifierName(@"System")),
                     UsingDirective(QualifiedName(QualifiedName(IdentifierName(@"System"), IdentifierName(@"Collections")), IdentifierName("Generic"))),
-                    UsingDirective(QualifiedName(IdentifierName(@"Newtonsoft"), IdentifierName(@"Json")))
+                    UsingDirective(QualifiedName(IdentifierName(@"Newtonsoft"), IdentifierName(@"Json"))),
+                    UsingDirective(QualifiedName(IdentifierName(@"System"), IdentifierName(@"Linq")))
            });
         }
 
@@ -93,36 +162,18 @@ namespace ConsoleApplication2
                  SyntaxFactory.MethodDeclaration(
                      PredefinedType(Token(SyntaxKind.VoidKeyword)),
                      Identifier(
-                         @"Main"))
+                         @"Run"))
                  .WithModifiers(
                      TokenList(new[] {
                          Token(
                              SyntaxKind.PublicKeyword), Token(SyntaxKind.StaticKeyword)}))
+                 .WithParameterList(ParameterList(SingletonSeparatedList<ParameterSyntax>(
+                        Parameter(Identifier("root"))
+                        .WithType(IdentifierName("Root"))
+                     )))
                  .WithBody(
                      Block(
-                            LocalDeclarationStatement(
-                                VariableDeclaration(IdentifierName("var"))
-                                    .WithVariables(SingletonSeparatedList<VariableDeclaratorSyntax>(
-                                        VariableDeclarator("roots")
-                                        .WithInitializer(EqualsValueClause(
-                                            InvocationExpression(
-                                                MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression,
-                                                IdentifierName("JsonConvert"), GenericName(Identifier("DeserializeObject")).WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(IdentifierName(commonInformation.RootClass.Name))))
-                                           ))                                           
-                                           .WithArgumentList(
-                                                ArgumentList(
-                                                SingletonSeparatedList(
-                                                    Argument(                                                    
-                                                        LiteralExpression(SyntaxKind.StringLiteralExpression,Literal(TriviaList(), "\"\{commonInformation.OriginalSource}}\"", "\"\{commonInformation.OriginalSource}}\"", TriviaList()))
-                                                    )
-                                                )
-                                            )
-                                        )
-                                      )
-                                   )         
-                                )
-                              )
-                            )
+                            
                          ))));
         }
 
@@ -143,6 +194,7 @@ namespace ConsoleApplication2
         private PropertyDeclarationSyntax VisitProperty(CommonProperty commonProperty)
         {
             return PropertyDeclaration(GetTypeSyntax(commonProperty), commonProperty.Name)
+                .WithModifiers(TokenList(Token(SyntaxKind.PublicKeyword)))
                  .AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithSemicolonToken(Token(SyntaxKind.SemicolonToken)))
                  .AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.SetAccessorDeclaration).WithSemicolonToken(Token(SyntaxKind.SemicolonToken)));
         }

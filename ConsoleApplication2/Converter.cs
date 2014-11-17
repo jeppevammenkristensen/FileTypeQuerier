@@ -45,6 +45,8 @@ namespace ConsoleApplication2
 
         public ParsedCommonInformation ParseJson(string json)
         {
+            
+
             using (var strreader = new StringReader(json))
             {
                 using (var reader = new JsonTextReader(strreader))
