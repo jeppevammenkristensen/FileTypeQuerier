@@ -53,7 +53,20 @@ namespace UnitTests.CoreLibrary.JSON
             var myArrayCommonClass = result.DependentClasses.First().Value;
 
             Assert.That(thirdProperty.CustomTypeId, Is.EqualTo(myArrayCommonClass.Id));
+        }
 
+        [Test]
+        public void Parse_JsonObjectWithSimpleArray_VerifyResult()
+        {
+            var parser = new JsonToCommonFormatConverter();
+            var result = parser.ParseJson("{ 'simpleArray' : [5,7,8] }");
+
+            BaseCheckForRoot(result, "Root","Root");
+
+            var firstProperty = result.RootClass.Properties[0];
+            Assert.That(firstProperty.IsArray, Is.True);
+            Assert.That(firstProperty.IsCustomType, Is.False);
+            Assert.That(firstProperty.Type, Is.EqualTo(CommonType.Integer));
         }
 
         protected void BaseCheckForRoot(ParsedCommonInformation result, string rootId, string rootName)
