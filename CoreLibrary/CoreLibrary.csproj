@@ -81,7 +81,7 @@
     <Compile Include="JSON\JsonToCommonFormatConverter.cs" />
     <Compile Include="ParsedCommonInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Compilation\CsharpRoslynSyntaxTreeGenerator.cs" />
+    <Compile Include="Compilation\CsharpRoslynCompilationInformationGenerator.cs" />
     <Compile Include="Compilation\CsharpRoslynCompilationInformation.cs" />
   </ItemGroup>
   <ItemGroup>

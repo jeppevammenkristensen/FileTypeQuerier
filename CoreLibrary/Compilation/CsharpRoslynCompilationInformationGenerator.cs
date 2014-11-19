@@ -10,7 +10,7 @@ using Newtonsoft.Json;
 
 namespace FileQuerier.CoreLibrary.Compilation
 {
-    public class CsharpRoslynSyntaxTreeGenerator
+    public class CsharpRoslynCompilationInformationGenerator
     {
         public CsharpRoslynCompilationInformation Parse(ParsedCommonInformation commonInformation)
         {

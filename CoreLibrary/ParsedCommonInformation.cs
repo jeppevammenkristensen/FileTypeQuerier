@@ -14,5 +14,11 @@ namespace FileQuerier.CoreLibrary
         public Dictionary<string, CommonClass> DependentClasses { get; }
         public string OriginalSource { get; }
         public CommonClass RootClass { get; }
+
+        public void RenameClass(string classId, string newName)
+        {
+            if (DependentClasses.ContainsKey(classId))
+                DependentClasses[classId].Name = newName;
+        }
     }
 }
