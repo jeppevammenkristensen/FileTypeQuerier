@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace CoreLibrary
+namespace FileQuerier.CoreLibrary
 {
     public class ParsedCommonInformation
     {

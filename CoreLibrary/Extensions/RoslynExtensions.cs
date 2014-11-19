@@ -1,8 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
-using System.Linq;
 
-namespace ConsoleApplication2.Extensions
+namespace FileQuerier.CoreLibrary.Extensions
 {
     public static class RoslynExtensions
     {

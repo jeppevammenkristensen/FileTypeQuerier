@@ -1,4 +1,4 @@
-﻿namespace CoreLibrary
+﻿namespace FileQuerier.CoreLibrary
 {
     public enum CommonType
     {

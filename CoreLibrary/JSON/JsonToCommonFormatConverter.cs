@@ -1,29 +1,32 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Runtime.ConstrainedExecution;
+using Newtonsoft.Json;
 
-namespace CoreLibrary.JSON
+namespace FileQuerier.CoreLibrary.JSON
 {
     public class JsonToCommonFormatConverter
     {
-        private Dictionary<string, CommonClass> classes = new Dictionary<string, CommonClass>(StringComparer.CurrentCultureIgnoreCase);
-        private CommonClass Root = null;
+        private readonly Dictionary<string, CommonClass> classes = new Dictionary<string, CommonClass>(StringComparer.CurrentCultureIgnoreCase);
+        private CommonClass _root = null;
+        private readonly Stack<CurrentArrayState> _arrayState = new Stack<CurrentArrayState>();
+        private readonly Stack<CommonClass> _classStack = new Stack<CommonClass>();
+        private readonly Stack<CommonProperty> _propertyStack = new Stack<CommonProperty>();
+
         protected CommonClass CurrentClass
         {
             get
             {
-                return ClassStack.Count == 0 ? null : ClassStack.Peek();
+                return _classStack.Count == 0 ? null : _classStack.Peek();
             }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("\{nameof(CurrentClass)}");
 
-                ClassStack.Push(value);
+                _classStack.Push(value);
             }
         }
 
@@ -31,24 +34,19 @@ namespace CoreLibrary.JSON
         {
             get
             {
-                return PropertyStack.Count == 0 ? null : PropertyStack.Peek();
+                return _propertyStack.Count == 0 ? null : _propertyStack.Peek();
             }
             set
             {
                 if (value == null)
                     throw new ArgumentNullException("\{nameof(CommonProperty)}");
 
-                PropertyStack.Push(value);
+                _propertyStack.Push(value);
             }
         }
 
-        private Stack<CommonClass> ClassStack = new Stack<CommonClass>();
-        private Stack<CommonProperty> PropertyStack = new Stack<CommonProperty>();
-
         public ParsedCommonInformation ParseJson(string json)
         {
-
-
             using (var strreader = new StringReader(json))
             {
                 using (var reader = new JsonTextReader(strreader))
@@ -57,8 +55,7 @@ namespace CoreLibrary.JSON
                     {
                         var tokenType = reader.TokenType;
                         switch (tokenType)
-                        {
-
+                        { 
                             case JsonToken.StartObject:
                                 VisitStartObject(reader);
                                 break;
@@ -100,24 +97,24 @@ namespace CoreLibrary.JSON
                     }
                 };
             }
-            return new ParsedCommonInformation(classes, Root, json);
+
+            WrapUp();
+
+            return new ParsedCommonInformation(classes, _root, json);
         }
+
+        private void WrapUp()
+        {
+            if (_root == null && _classStack.Count == 1)
+            {
+                _root = _classStack.Pop();
+            }
+        }
+
         private void VisitNull(JsonTextReader reader)
         {
             throw new NotImplementedException();
         }
-
-
-        //    //var result = JsonConvert.,
-        //    return ClassDeclaration("Root")
-        //        .WithModifiers(SyntaxTokenList.Create(Token(SyntaxKind.PublicKeyword)))
-        //        .WithMembers(List<MemberDeclarationSyntax>(new[] {
-        //                PropertyDeclaration(PredefinedType(Token(SyntaxKind.StringKeyword)),"firstName")
-        //                    .AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithSemicolonToken(Token(SyntaxKind.SemicolonToken)))
-        //                    .AddAccessorListAccessors(AccessorDeclaration(SyntaxKind.SetAccessorDeclaration).WithSemicolonToken(Token(SyntaxKind.SemicolonToken)))
-        //    })).ToString();
-        //}
-
 
         private void VisitPredefinedType(JsonTextReader reader, JsonToken tokenType)
         {
@@ -128,7 +125,7 @@ namespace CoreLibrary.JSON
 
             if (!CurrentProperty.IsArray)
             {
-                CurrentClass.AddProperties(PropertyStack.Pop());
+                CurrentClass.AddProperties(_propertyStack.Pop());
             }
 
         }
@@ -157,8 +154,17 @@ namespace CoreLibrary.JSON
         }
         private void VisitStartArray(JsonTextReader reader)
         {
+            _arrayState.Push(new CurrentArrayState());
+
             if (CurrentProperty == null)
-                CurrentProperty.Name = "Contents";
+            {
+                CurrentProperty = new CommonProperty {Name = "Contents"};
+            }
+
+            if (CreateRootClass)
+            {
+                CurrentClass = new CommonClass() {Id = "Root", Name = "Root"};
+            }
 
             CurrentProperty.IsArray = true;
         }
@@ -166,43 +172,81 @@ namespace CoreLibrary.JSON
         private void VisitEndArray(JsonTextReader reader)
         {
             if (!CurrentProperty.IsCustomType)
+            {
                 CurrentClass.AddProperties(CurrentProperty);
+            }
 
-            PropertyStack.Pop();
+            _propertyStack.Pop();
         }
 
         private void VisitStartObject(JsonTextReader reader)
         {
-            if (!classes.Any() && CurrentClass == null)
+            if (CurrentProperty?.IsArray == true)
             {
                 CurrentClass = new CommonClass();
-                CurrentClass.Id = "Root";
-                CurrentClass.Name = "Root";
+
+                if (_arrayState.Peek().FirstObjectCreated)
+                {
+                    CurrentClass.Id = _arrayState.Peek().ClassId;
+                }
+                else
+                {
+                    CurrentClass.Id = GenerateClassId(CurrentProperty.Name);
+                    CurrentClass.Name = CurrentClass.Id;
+                    CurrentProperty.Type = CommonType.Custom;
+                    CurrentProperty.IsCustomType = true;
+                    _arrayState.Peek().ClassId = CurrentProperty.CustomTypeId = CurrentClass.Id;
+                }
+
+                return;
             }
-            else
+
+            var createRootClass = CreateRootClass;
+            CurrentClass = GetClassWithRootIfNecesarry();
+
+            if (!createRootClass)
             {
-                CurrentClass = new CommonClass();
-                CurrentClass.Name = CurrentProperty.Name;
                 CurrentClass.Id = GenerateClassId(CurrentClass.Name);
+                CurrentClass.Name = CurrentClass.Name;
                 CurrentProperty.Type = CommonType.Custom;
                 CurrentProperty.IsCustomType = true;
-                CurrentProperty.CustomTypeId = CurrentProperty.Name;
+                CurrentProperty.CustomTypeId = CurrentClass.Id;
             }
         }
 
         private string GenerateClassId(string name)
         {
-            var id = ClassStack.Skip(1).First()?.Id;
+            var id = _classStack.Skip(1).First()?.Id;
             return "\{id}_\{name}";
         }
+        
+        private CommonClass GetClassWithRootIfNecesarry()
+        {
+            if (!classes.Any() && CurrentClass == null)
+            {
+                return new CommonClass()
+                {
+                    Id = "Root",
+                    Name = "Root"
+                };
+            }
+
+            return new CommonClass();
+        }
+
+        private bool CreateRootClass => !classes.Any() && CurrentClass == null;
 
         private void VisitEndObject(JsonTextReader reader)
         {
-            var candidate = ClassStack.Pop();
+            var candidate = _classStack.Pop();
+            if (CurrentProperty?.IsArray == true && !_arrayState.Peek().FirstObjectCreated)
+            {
+                _arrayState.Peek().FirstObjectCreated = true;
+            }
 
             if (candidate.Name == "Root")
             {
-                Root = candidate;
+                _root = candidate;
             }
             else if (classes.ContainsKey(candidate.Id))
             {
@@ -214,13 +258,11 @@ namespace CoreLibrary.JSON
                 classes.Add(candidate.Id, candidate);
             }
 
-            if (CurrentClass != null)
-            {
-                CurrentClass.AddProperties(CurrentProperty);
-            }
+            CurrentClass?.AddProperties(CurrentProperty);
 
             if (!CurrentProperty?.IsArray ?? false)
-                PropertyStack.Pop();
+                _propertyStack.Pop();
+            
         }
 
         private void VisitComment(JsonTextReader reader)
