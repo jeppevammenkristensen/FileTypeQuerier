@@ -69,6 +69,20 @@ namespace UnitTests.CoreLibrary.JSON
             Assert.That(firstProperty.Type, Is.EqualTo(CommonType.Integer));
         }
 
+        [Test]
+        public void Parse_SimpleTypes_VerifyResult()
+        {
+            var parser = new JsonToCommonFormatConverter();
+            var result = parser.ParseJson("{ 'intProperty' : 5, 'stringProperty' : 'string', 'floatProperty': 50.0, 'booleanProperty' : true }");
+
+            BaseCheckForRoot(result, "Root", "Root");
+
+            AssertSimpleProperty(result.RootClass.Properties[0],"intProperty", CommonType.Integer);
+            AssertSimpleProperty(result.RootClass.Properties[1], "stringProperty", CommonType.String);
+            AssertSimpleProperty(result.RootClass.Properties[2], "floatProperty", CommonType.Float);
+            AssertSimpleProperty(result.RootClass.Properties[3], "booleanProperty", CommonType.Boolean);
+        }
+
         protected void BaseCheckForRoot(ParsedCommonInformation result, string rootId, string rootName)
         {
             Assert.That(result.RootClass, Is.Not.Null,"Root must be null");
@@ -79,6 +93,12 @@ namespace UnitTests.CoreLibrary.JSON
             Assert.That(commonClass, Is.Not.Null);
             Assert.That(commonClass.Id, Is.EqualTo(id));
             Assert.That(commonClass.Name, Is.EqualTo(name));
+        }
+
+        protected void AssertSimpleProperty(CommonProperty property, string name, CommonType expectedProperty)
+        {
+            AssertProperty(property, name, false);
+            Assert.That(property.Type, Is.EqualTo(expectedProperty));
         }
 
         protected void AssertProperty(CommonProperty property, string name, bool isArray)

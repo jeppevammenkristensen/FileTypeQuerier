@@ -3,7 +3,7 @@
     public enum CommonType
     {
         Undetermined,
-        StringType,
+        String,
         Custom,
         Integer,
         Float,

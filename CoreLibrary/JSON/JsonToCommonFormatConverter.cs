@@ -139,7 +139,7 @@ namespace FileQuerier.CoreLibrary.JSON
                 case JsonToken.Float:
                     return CommonType.Float;
                 case JsonToken.String:
-                    return CommonType.StringType;
+                    return CommonType.String;
                 case JsonToken.Boolean:
                     return CommonType.Boolean;
                 case JsonToken.Undefined:

@@ -175,7 +175,7 @@ namespace FileQuerier.CoreLibrary.Compilation
             {
                 case CommonType.Undetermined:
                     return EnsureList(commonProperty, PredefinedType(Token(SyntaxKind.ObjectKeyword)));
-                case CommonType.StringType:
+                case CommonType.String:
                     return EnsureList(commonProperty, PredefinedType(Token(SyntaxKind.StringKeyword)));
                 case CommonType.Custom:
                     return EnsureList(commonProperty, IdentifierName(commonProperty.CustomTypeId));
