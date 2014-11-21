@@ -207,7 +207,7 @@ namespace FileQuerier.CoreLibrary.JSON
             if (!createRootClass)
             {
                 CurrentClass.Id = GenerateClassId(CurrentProperty.Name);
-                CurrentClass.Name = CurrentClass.Name;
+                CurrentClass.Name = CurrentClass.Id;
                 CurrentProperty.Type = CommonType.Custom;
                 CurrentProperty.IsCustomType = true;
                 CurrentProperty.CustomTypeId = CurrentClass.Id;

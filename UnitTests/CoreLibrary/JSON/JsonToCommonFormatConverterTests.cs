@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Runtime.ExceptionServices;
 using FileQuerier.CoreLibrary;
 using FileQuerier.CoreLibrary.JSON;
 using NUnit.Framework;
@@ -17,7 +16,7 @@ namespace UnitTests.CoreLibrary.JSON
             BaseCheckForRoot(result, "Root","Root");
             AssertProperty(result.RootClass.Properties[0], "Contents", true);
 
-            Assert.That(result.DependentClasses, Has.Count.EqualTo(1));
+            Assert.That(result.DependentClasses, Has.Count.EqualTo(2));
             var childClass = result.DependentClasses.First().Value;
             AssertCommonClass(childClass,"Root_Contents","Root_Contents");
             AssertProperty(childClass.Properties[0], "firstName", false);
@@ -33,7 +32,7 @@ namespace UnitTests.CoreLibrary.JSON
             AssertProperty(result.RootClass.Properties[0], "firstName", false);
             AssertProperty(result.RootClass.Properties[1], "lastName", false);
 
-            Assert.That(result.DependentClasses, Is.Empty);
+            Assert.That(result.DependentClasses, Has.Count.EqualTo(1));
         }
         [Test]
         public void Parse_IsComplexerObject_VerifyResult()
@@ -54,6 +53,24 @@ namespace UnitTests.CoreLibrary.JSON
 
             Assert.That(thirdProperty.CustomTypeId, Is.EqualTo(myArrayCommonClass.Id));
         }
+
+        [Test]
+        public void Parse_JsonObjectWithMultiplePropertiesPointingToComplexType_ReturnsExpectedIdAndNameOfClass()
+        {
+            var parser = new JsonToCommonFormatConverter();
+            var result = parser.ParseJson("{ 'firstProperty' : { 'firstName' : 'Jeppe'}, 'secondProperty':{'lastName' : 'Kristensen' }}");
+
+            BaseCheckForRoot(result,"Root","Root");
+            var firstClass = result.DependentClasses.First();
+            var secondClass = result.DependentClasses.ElementAt(1);
+
+            Assert.That(firstClass.Value.Id, Is.EqualTo("Root_firstProperty"));
+            Assert.That(secondClass.Value.Id, Is.EqualTo("Root_secondProperty"));
+            
+            Assert.That(firstClass.Value.Name, Is.EqualTo("Root_firstProperty"), "Name");
+            Assert.That(secondClass.Value.Name, Is.EqualTo("Root_secondProperty"), "Name");
+        }
+
 
         [Test]
         public void Parse_JsonObjectWithSimpleArray_VerifyResult()
@@ -87,6 +104,7 @@ namespace UnitTests.CoreLibrary.JSON
         {
             Assert.That(result.RootClass, Is.Not.Null,"Root must be null");
             AssertCommonClass(result.RootClass, rootId, rootName);
+            Assert.That(result.DependentClasses.Select(x => x.Value), Has.Member(result.RootClass));
         }
         protected void AssertCommonClass(CommonClass commonClass, string id, string name)
         {
