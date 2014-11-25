@@ -22,7 +22,8 @@ namespace FileQuerier.CoreLibrary.Compilation
             {
                 MetadataReference.CreateFromAssembly(typeof (object).Assembly),
                 MetadataReference.CreateFromAssembly(typeof (JsonReader).Assembly),
-                MetadataReference.CreateFromAssembly(typeof (Enumerable).Assembly)
+                MetadataReference.CreateFromAssembly(typeof (Enumerable).Assembly),
+                MetadataReference.CreateFromAssembly(typeof (Utilities.EnumerableExtensions).Assembly)
             };
 
             return new CsharpRoslynCompilationInformation(compilationRoot, references);
@@ -117,7 +118,8 @@ namespace FileQuerier.CoreLibrary.Compilation
                     UsingDirective(IdentifierName(@"System")),
                     UsingDirective(QualifiedName(QualifiedName(IdentifierName(@"System"), IdentifierName(@"Collections")), IdentifierName("Generic"))),
                     UsingDirective(QualifiedName(IdentifierName(@"Newtonsoft"), IdentifierName(@"Json"))),
-                    UsingDirective(QualifiedName(IdentifierName(@"System"), IdentifierName(@"Linq")))
+                    UsingDirective(QualifiedName(IdentifierName(@"System"), IdentifierName(@"Linq"))),
+                    UsingDirective(QualifiedName(IdentifierName(@"FileQuerier"), IdentifierName(@"Utilities")))
            });
         }
 
@@ -151,7 +153,10 @@ namespace FileQuerier.CoreLibrary.Compilation
 
         private SyntaxList<MemberDeclarationSyntax> VisitClasses(ParsedCommonInformation commonInformation)
         {
-            return List<MemberDeclarationSyntax>(commonInformation.DependentClasses.Select(x => x.Value).Concat(new List<CommonClass>() { commonInformation.RootClass }).Select(x => VisitClass(x, commonInformation)).Concat(new List<ClassDeclarationSyntax>() { GenerateShowRunner(commonInformation) }));
+            return List<MemberDeclarationSyntax>(commonInformation.DependentClasses.Where(x => x.Key != commonInformation.RootClass.Id)
+                .Select(x => x.Value)
+                .Concat(new List<CommonClass>() { commonInformation.RootClass })
+                .Select(x => VisitClass(x, commonInformation)).Concat(new List<ClassDeclarationSyntax>() { GenerateShowRunner(commonInformation) }));
         }
 
         private ClassDeclarationSyntax VisitClass(CommonClass commonClass, ParsedCommonInformation commonInformation)
