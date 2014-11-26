@@ -25,7 +25,10 @@ namespace ConsoleExample
 
             while (true)
             {
-                Console.Write("Write a code line");
+                Console.WriteLine("Write a code line");
+                Console.WriteLine("You can use Each (for instance (...Each(x => x.name.Dump())");
+                Console.WriteLine("Or you can use Dump on objects");
+                Console.Write(">");
                 using (var compilation = transformer.Transform(compilationInformation, Console.ReadLine()))
                 {
                     OutputCompilationValues(compilation, false);
