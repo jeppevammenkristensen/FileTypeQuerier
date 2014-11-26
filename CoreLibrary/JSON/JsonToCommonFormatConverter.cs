@@ -175,22 +175,23 @@ namespace FileQuerier.CoreLibrary.JSON
             {
                 CurrentClass.AddProperties(CurrentProperty);
             }
-
+            
             _propertyStack.Pop();
+            _arrayState.Pop();
         }
 
         private void VisitStartObject(JsonTextReader reader)
         {
             if (CurrentProperty?.IsArray == true)
             {
-                CurrentClass = new CommonClass();
-
                 if (_arrayState.Peek().FirstObjectCreated)
                 {
+                    CurrentClass = new CommonClass();
                     CurrentClass.Id = _arrayState.Peek().ClassId;
                 }
                 else
                 {
+                    CurrentClass =new CommonClass();
                     CurrentClass.Id = GenerateClassId(CurrentProperty.Name);
                     CurrentClass.Name = CurrentClass.Id;
                     CurrentProperty.Type = CommonType.Custom;

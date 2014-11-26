@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using FileQuerier.CoreLibrary;
 using FileQuerier.CoreLibrary.JSON;
 using NUnit.Framework;
@@ -98,6 +99,19 @@ namespace UnitTests.CoreLibrary.JSON
             AssertSimpleProperty(result.RootClass.Properties[1], "stringProperty", CommonType.String);
             AssertSimpleProperty(result.RootClass.Properties[2], "floatProperty", CommonType.Float);
             AssertSimpleProperty(result.RootClass.Properties[3], "booleanProperty", CommonType.Boolean);
+        }
+
+        [Test]
+        public void Parse_FacebookExample_VerifyResult()
+        {
+            var parser = new JsonToCommonFormatConverter();
+            var result = parser.ParseJson(File.ReadAllText("CoreLibrary/FileSample.json"));
+
+            BaseCheckForRoot(result, "Root", "Root");
+
+            AssertCommonClass(result.DependentClasses["Root_data_from"], "Root_data_from", "Root_data_from");
+            AssertCommonClass(result.DependentClasses["Root_data_actions"], "Root_data_actions", "Root_data_actions");
+            AssertCommonClass(result.DependentClasses["Root_data"], "Root_data", "Root_data");
         }
 
         protected void BaseCheckForRoot(ParsedCommonInformation result, string rootId, string rootName)

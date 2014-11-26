@@ -47,9 +47,11 @@
     <Compile Include="CoreLibrary\ParsedCommonInformationTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\ExtensionsTester.cs" />
-    <Compile Include="Utilities\TypeDumper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CoreLibrary\FileSample.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
