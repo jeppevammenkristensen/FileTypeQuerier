@@ -46,6 +46,8 @@
     <Compile Include="CoreLibrary\JSON\JsonToCommonFormatConverterTests.cs" />
     <Compile Include="CoreLibrary\ParsedCommonInformationTester.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\ExtensionsTester.cs" />
+    <Compile Include="Utilities\TypeDumper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -54,6 +56,10 @@
     <ProjectReference Include="..\CoreLibrary\CoreLibrary.csproj">
       <Project>{CD8D2012-11B6-4D12-A9EB-A90AA92C8D83}</Project>
       <Name>CoreLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.csproj">
+      <Project>{96112B1E-7CB3-4340-A852-FD32473703CB}</Project>
+      <Name>Utilities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
