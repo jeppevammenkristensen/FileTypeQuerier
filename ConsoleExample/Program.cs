@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using FileQuerier.CoreLibrary.Compilation;
+using FileQuerier.CoreLibrary.Compilation.Csharp;
 using FileQuerier.CoreLibrary.JSON;
 using FileQuerier.CoreLibrary.Runners;
 

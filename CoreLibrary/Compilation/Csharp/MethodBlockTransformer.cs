@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace FileQuerier.CoreLibrary.Compilation
+namespace FileQuerier.CoreLibrary.Compilation.Csharp
 {
     public class MethodBlockTransformer
     {

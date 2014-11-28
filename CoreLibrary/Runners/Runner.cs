@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FileQuerier.CoreLibrary.Compilation;
+using FileQuerier.CoreLibrary.Compilation.Csharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -86,7 +87,7 @@ namespace FileQuerier.CoreLibrary.Runners
         /// <param name="compilationResult"></param>
         private void ValidateInput(CompilationResult compilationResult)
         {
-            if (!compilationResult.WasSuccesful)
+            if (!compilationResult.SuccesfulCompilation)
                 throw new InvalidOperationException(
                     "The code did not compile has \{compilationResult.Errors.Count} errors <newline> \{compilationResult.CodeAsString}");
         }

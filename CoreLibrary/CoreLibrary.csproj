@@ -76,15 +76,15 @@
     <Compile Include="CommonClass.cs" />
     <Compile Include="CommonProperty.cs" />
     <Compile Include="CommonType.cs" />
-    <Compile Include="Compilation\Compiler.cs" />
-    <Compile Include="Compilation\MethodBlockTransformer.cs" />
+    <Compile Include="Compilation\Csharp\Compiler.cs" />
+    <Compile Include="Compilation\Csharp\MethodBlockTransformer.cs" />
     <Compile Include="Extensions\RoslynExtensions.cs" />
     <Compile Include="JSON\CurrentArrayState.cs" />
     <Compile Include="JSON\JsonToCommonFormatConverter.cs" />
     <Compile Include="ParsedCommonInformation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Compilation\CsharpRoslynCompilationInformationGenerator.cs" />
-    <Compile Include="Compilation\CsharpRoslynCompilationInformation.cs" />
+    <Compile Include="Compilation\Csharp\CsharpRoslynCompilationInformationGenerator.cs" />
+    <Compile Include="Compilation\Csharp\CsharpRoslynCompilationInformation.cs" />
     <Compile Include="Resources\ExceptionMessages.cs" />
     <Compile Include="Runners\Runner.cs" />
   </ItemGroup>

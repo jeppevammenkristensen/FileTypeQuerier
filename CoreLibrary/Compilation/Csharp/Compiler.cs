@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
-namespace FileQuerier.CoreLibrary.Compilation
+namespace FileQuerier.CoreLibrary.Compilation.Csharp
 {
     public class CompilationResult : IDisposable
     {

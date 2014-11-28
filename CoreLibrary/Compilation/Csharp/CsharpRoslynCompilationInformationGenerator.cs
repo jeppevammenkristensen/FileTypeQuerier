@@ -8,7 +8,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Newtonsoft.Json;
 
-namespace FileQuerier.CoreLibrary.Compilation
+namespace FileQuerier.CoreLibrary.Compilation.Csharp
 {
     public class CsharpRoslynCompilationInformationGenerator
     {
