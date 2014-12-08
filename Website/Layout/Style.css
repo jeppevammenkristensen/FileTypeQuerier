@@ -13,6 +13,7 @@ header {
 
 }
 
+/* It's there but i'm not certain it should stay there''*/
 footer {
     margin-top: 50px;
     width: 100%;
@@ -27,7 +28,7 @@ div.mainContent {
     
     margin: auto;
     width: 70%;
-    min-height: 650px;
+    min-height: 850px;
     background: white;
     display: block;
     -ms-border-bottom-right-radius: 30px;
