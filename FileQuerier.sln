@@ -13,6 +13,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleExample", "ConsoleEx
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "Utilities\Utilities.csproj", "{96112B1E-7CB3-4340-A852-FD32473703CB}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PublishScripts", "PublishScripts", "{9B60BFE8-FAC9-462E-A3E6-5D70FB4B1C7B}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\AzureWebsitePublishModule.psm1 = PublishScripts\AzureWebsitePublishModule.psm1
+		PublishScripts\Publish-WebApplicationWebsite.ps1 = PublishScripts\Publish-WebApplicationWebsite.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configurations", "Configurations", "{AA6D6E45-5451-4B91-B40A-0D8686BCCF09}"
+	ProjectSection(SolutionItems) = preProject
+		PublishScripts\Configurations\NugetServer-WAWS-dev.json = PublishScripts\Configurations\NugetServer-WAWS-dev.json
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Website", "Website\Website.csproj", "{A2C8790D-433A-415E-8E57-0808B191F531}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,11 +84,25 @@ Global
 		{96112B1E-7CB3-4340-A852-FD32473703CB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{96112B1E-7CB3-4340-A852-FD32473703CB}.Release|x86.ActiveCfg = Release|Any CPU
 		{96112B1E-7CB3-4340-A852-FD32473703CB}.Release|x86.Build.0 = Release|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Debug|x86.Build.0 = Debug|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Release|x86.ActiveCfg = Release|Any CPU
+		{A2C8790D-433A-415E-8E57-0808B191F531}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A75ED3D3-9318-4687-9449-07C84E2A089D} = {361DD07D-137F-4DAB-B14D-116A3E7DEC52}
+		{AA6D6E45-5451-4B91-B40A-0D8686BCCF09} = {9B60BFE8-FAC9-462E-A3E6-5D70FB4B1C7B}
+		{A2C8790D-433A-415E-8E57-0808B191F531} = {361DD07D-137F-4DAB-B14D-116A3E7DEC52}
 	EndGlobalSection
 EndGlobal

@@ -18,8 +18,8 @@ namespace FileQuerier.CoreLibrary.Compilation.Csharp
         public CompilationResult(EmitResult result, MemoryStream memoryStream)
         {
             MemoryStream = memoryStream;
-            WasSuccesful = result.Success;
-            if (!WasSuccesful)
+            SuccesfulCompilation = result.Success;
+            if (!SuccesfulCompilation)
             {
                 Warnings = result.Diagnostics.Where(x => x.Severity == DiagnosticSeverity.Warning).ToList();
                 Errors = result.Diagnostics.Where(x => x.Severity == DiagnosticSeverity.Error).ToList();
@@ -32,14 +32,13 @@ namespace FileQuerier.CoreLibrary.Compilation.Csharp
 
         public List<Diagnostic> Warnings { get; set; }
 
-        public bool WasSuccesful { get; }
+        public bool SuccesfulCompilation { get; }
 
         public CompilationResult WithCodeAsString(string codeAsString)
         {
             CodeAsString = codeAsString;
             return this;
         }
-
 
         public void Dispose()
         {

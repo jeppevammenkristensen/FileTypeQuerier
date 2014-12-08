@@ -33,7 +33,7 @@ namespace ConsoleExample
                 using (var compilation = transformer.Transform(compilationInformation, Console.ReadLine()))
                 {
                     OutputCompilationValues(compilation, false);
-                    if (compilation.WasSuccesful)
+                    if (compilation.SuccesfulCompilation)
                     {
                         try
                         {
@@ -50,7 +50,7 @@ namespace ConsoleExample
 
         private static void OutputCompilationValues(CompilationResult result, bool verboseSuccess = true)
         {
-            if (result.WasSuccesful)
+            if (result.SuccesfulCompilation)
             {
                 if (!verboseSuccess)
                     return;
