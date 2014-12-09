@@ -3,13 +3,14 @@
 }
 
 header {
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 5px;
+    padding-bottom: 5px;
     width: 100%;
-    background-color: seashell;
+    background-color: rgb(100, 173, 245);
     color: black;
     text-align: center;
     border-bottom: solid black 1px;
+    box-shadow: 5px 5px 5px rgba(100,173,245,0.5)
 
 }
 
@@ -20,14 +21,11 @@ footer {
     height: 200px;
     background-color: white;
     clear: both;
-
-
 }
 
 div.mainContent {
-    
     margin: auto;
-    width: 70%;
+    width: 80%;
     min-height: 850px;
     background: white;
     display: block;
@@ -37,6 +35,36 @@ div.mainContent {
     -ms-box-shadow: 10px 10px black;
     box-shadow: 10px 10px 10px #000000;
     box-shadow: 10px 10px 10px rgba(0,0,0,0.5);
+}
+
+div.textContent {
+    width: 100%;
+}
+
+div.textContent > div {
+    margin: auto;
+    width: 80%;
+    padding: 10px;
+}
+
+div.textContent > div > textarea {
+     -ms-border-radius: 20px;
+    border-radius: 10px;
+    width: 100%;
+    box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+    min-height: 450px;
+}
+
+textarea.hover {
+    border: black dotted 2px;
+}
+
+textarea.valid {
+    border: green solid 1px;
+}
+
+textarea.invalid {
+    border: red solid 1px;
 }
 
 

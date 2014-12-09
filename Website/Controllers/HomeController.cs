@@ -26,5 +26,10 @@ namespace Website.Controllers
 
             return View();
         }
+        [HttpPost]
+        public JsonResult UploadJson(string json)
+        {
+            return Json(json);
+        }
     }
 }

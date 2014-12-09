@@ -11,10 +11,10 @@
         <h1>Title of the page</h1>
     </header>
 
-    <div class="mainContent">
-        @RenderBody()
-    </div>
+<div class="mainContent">
+    @RenderBody()
+</div>
 
-   
+    @RenderSection("BottomScripts", required:false)
 </body>
 </html>
